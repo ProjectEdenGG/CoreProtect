@@ -2,6 +2,7 @@ import org.apache.tools.ant.filters.ReplaceTokens
 
 plugins {
     id 'java'
+    id 'maven-publish'
     id 'com.github.johnrengelman.shadow' version '7.1.2'
     id 'com.palantir.git-version' version '0.13.0'
 }
@@ -12,15 +13,6 @@ String projectBranch = ''
 version = projectVersion // `version` might be modified, we don't always want that (e.g. plugin.yml)
 description = 'Provides block protection for your server.'
 sourceCompatibility = '17'
-
-if (System.getenv("BUILD_NUMBER") != null) {
-    // Being built in Jenkins, append Build ID
-    version += "-${System.getenv("BUILD_NUMBER")}"
-} else if (!(version ==~ '^[^.]*\\.[^.]*\\.[^.]*$')) { // Thanks https://stackoverflow.com/a/9949200/1709894
-    // Append the Git hash if 'version' has less than two periods
-    version += "-${gitVersion()}"
-}
-logger.info("Building version $version")
 
 repositories {
     jcenter()
@@ -88,4 +80,23 @@ processResources {
             return replaceTokens.readLines().join('\n')
         }
     })
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+        }
+    }
+
+    repositories {
+        maven {
+            name = "edenReleases"
+            url = uri("https://sonatype.projecteden.gg/repository/maven-releases/")
+            credentials {
+                username "$edenSnapshotsUsername"
+                password "$edenSnapshotsPassword"
+            }
+        }
+    }
 }
