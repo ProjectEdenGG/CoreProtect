@@ -3,7 +3,10 @@ package net.coreprotect.database.logger;
 import java.sql.PreparedStatement;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.atomic.AtomicBoolean;
 
+import net.coreprotect.event.CoreProtectPreLogBlockEvent;
+import net.coreprotect.event.CoreProtectPreLogBlockEvent.BlockAction;
 import org.bukkit.Location;
 import org.bukkit.Material;
 
@@ -63,6 +66,14 @@ public class BlockBreakLogger {
 
             if (event.isCancelled()) {
                 return;
+            }
+
+            CoreProtectPreLogBlockEvent blockEvent = new CoreProtectPreLogBlockEvent(user, BlockAction.BREAK, location, checkType, blockData);
+            if (Config.getGlobal().API_ENABLED) {
+                CoreProtect.getInstance().getServer().getPluginManager().callEvent(blockEvent);
+
+                if(blockEvent.isCancelled())
+                    return;
             }
 
             BlockStatement.insert(preparedStmt, batchCount, time, userId, wid, x, y, z, type, data, meta, blockData, 0, 0);

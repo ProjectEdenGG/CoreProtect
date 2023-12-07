@@ -9,7 +9,7 @@ plugins {
 }
 
 group = 'net.coreprotect'
-String projectVersion = '22.2'
+String projectVersion = '22.3.1'
 String projectBranch = ''
 version = projectVersion // `version` might be modified, we don't always want that (e.g. plugin.yml)
 description = 'Provides block protection for your server.'
@@ -81,6 +81,20 @@ processResources {
             return replaceTokens.readLines().join('\n')
         }
     })
+}
+
+tasks {
+    compileJava {
+        options.encoding = "UTF-8"
+        options.release.set(17)
+        options.compilerArgs.add("-parameters")
+    }
+
+    javadoc { options.encoding = "UTF-8" }
+
+    processResources {
+        filteringCharset = "UTF-8"
+    }
 }
 
 publishing {

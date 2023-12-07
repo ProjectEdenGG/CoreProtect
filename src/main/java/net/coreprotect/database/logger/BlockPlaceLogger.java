@@ -4,6 +4,8 @@ import java.sql.PreparedStatement;
 import java.util.List;
 import java.util.Locale;
 
+import net.coreprotect.event.CoreProtectPreLogBlockEvent;
+import net.coreprotect.event.CoreProtectPreLogBlockEvent.BlockAction;
 import org.bukkit.Material;
 import org.bukkit.block.BlockState;
 
@@ -94,6 +96,14 @@ public class BlockPlaceLogger {
 
             if (event.isCancelled()) {
                 return;
+            }
+
+            CoreProtectPreLogBlockEvent blockEvent = new CoreProtectPreLogBlockEvent(user, BlockAction.PLACE, block.getLocation(), type, blockData);
+            if (Config.getGlobal().API_ENABLED) {
+                CoreProtect.getInstance().getServer().getPluginManager().callEvent(blockEvent);
+
+                if(blockEvent.isCancelled())
+                    return;
             }
 
             int internalType = Util.getBlockId(type.name(), true);

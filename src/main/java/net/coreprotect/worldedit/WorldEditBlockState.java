@@ -205,7 +205,7 @@ public final class WorldEditBlockState implements BlockState {
         return null;
     }
 
-    @Override
+    //@Override
     public BlockState copy() {
         // TODO Auto-generated method stub
         return null;
