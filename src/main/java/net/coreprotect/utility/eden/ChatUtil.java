@@ -7,27 +7,32 @@ import org.bukkit.command.CommandSender;
 
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 
 public class ChatUtil {
 
-    public static void send(CommandSender player, String command, String action, String time, int unix, String tag, String phrase){
+    public static void send(String[] data, CommandSender player, String command, String action, String time, int unix, String tag, String phrase){
         long timeLong = Long.parseLong(time);
         String formattedTime = Color.GREY + getFormattedTime(timeLong);
         String timeSince = Color.GREY + getTimeSince(timeLong, unix);
+
+        List<String> dataFinal = Arrays.stream(data).filter(line -> line != null && !line.isEmpty()).toList();
 
         new JsonBuilder().group()
                 .next(timeSince).hover(formattedTime).group()
                 .next(" " + tag + " ").group()
                 .next(phrase).hover(action).group()
+                //.next(" [Data]").hover(dataFinal).group()
                 .send(player);
     }
 
-    public static void send(CommandSender player, String command, int worldId, int x, int y, int z, boolean displayWorld, boolean italic, String action, String time, int unix, String tag, String phrase){
-        send(player, command, worldId, x, y, z, displayWorld, italic, action, time, unix, tag, phrase, null);
+    public static void send(String[] data, CommandSender player, String command, int worldId, int x, int y, int z, boolean displayWorld, boolean italic, String action, String time, int unix, String tag, String phrase){
+        send(data, player, command, worldId, x, y, z, displayWorld, italic, action, time, unix, tag, phrase, null);
     }
 
-    public static void send(CommandSender player, String command, int worldId, int x, int y, int z, boolean displayWorld, boolean italic, String action, String time, int unix, String tag, String phrase, String phraseHover){
+    public static void send(String[] data, CommandSender player, String command, int worldId, int x, int y, int z, boolean displayWorld, boolean italic, String action, String time, int unix, String tag, String phrase, String phraseHover){
         StringBuilder worldDisplay = new StringBuilder();
         if (displayWorld)
             worldDisplay.append("/" + Util.getWorldName(worldId));
@@ -43,10 +48,13 @@ public class ChatUtil {
         if(phraseHover != null && !phraseHover.isEmpty())
             phraseHoverFinal = phraseHover + "\n" + phraseHoverFinal;
 
+        List<String> dataFinal = Arrays.stream(data).filter(line -> line != null && !line.isEmpty()).toList();
+
         new JsonBuilder().group()
                 .next(timeSince).hover(formattedTime).group()
                 .next(" " + tag + " ").group()
                 .next(phrase).hover(phraseHoverFinal).command(teleportCommand).group()
+                //.next(" [Data]").hover(dataFinal).group()
                 .send(player);
     }
 

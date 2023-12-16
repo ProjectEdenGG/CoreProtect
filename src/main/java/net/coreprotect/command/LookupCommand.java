@@ -834,7 +834,7 @@ public class LookupCommand {
                                                     String tag = Color.WHITE + "- ";
                                                     String phraseFinal = Color.DARK_AQUA + dplayer + ": " + Color.WHITE + message;
                                                     String action = finalArgAction.contains(6) ? "(a:chat)" : "(a:command)";
-                                                    ChatUtil.send(player2, command.getName(), action, time, unixtimestamp, tag, phraseFinal);
+                                                    ChatUtil.send(data, player2, command.getName(), action, time, unixtimestamp, tag, phraseFinal);
                                                     //Chat.sendComponent(player2, timeago + " " + Color.WHITE + "- " + Color.DARK_AQUA + dplayer + ": " + Color.WHITE, message);
                                                     if (PluginChannelHandshakeListener.getInstance().isPluginChannelPlayer(player2)) {
                                                         int wid = Integer.parseInt(data[3]);
@@ -866,8 +866,7 @@ public class LookupCommand {
 
                                                     String tag = (action != 0 ? Color.GREEN + "+" : Color.RED + "-");
                                                     String phraseFinal = Phrase.build(Phrase.LOOKUP_LOGIN, Color.DARK_AQUA + dplayer + Color.WHITE, (action != 0 ? Selector.FIRST : Selector.SECOND));
-                                                    ChatUtil.send(player2, command.getName(), wid, x, y, z, true, true, "(a:session)", time, unixtimestamp, tag, phraseFinal);
-
+                                                    ChatUtil.send(data, player2, command.getName(), wid, x, y, z, true, true, "(a:session)", time, unixtimestamp, tag, phraseFinal);
                                                     //Chat.sendComponent(player2, timeago + " " + tag + " " + Color.DARK_AQUA + Phrase.build(Phrase.LOOKUP_LOGIN, Color.DARK_AQUA + dplayer + Color.WHITE, (action != 0 ? Selector.FIRST : Selector.SECOND)));
                                                     //Chat.sendComponent(player2, Color.WHITE + leftPadding + Color.GREY + "^ " + Util.getCoordinates(command.getName(), wid, x, y, z, true, true) + "");
                                                     PluginChannelListener.getInstance().sendInfoData(player2, Integer.parseInt(time), Phrase.LOOKUP_LOGIN, (action != 0 ? Selector.FIRST : Selector.SECOND), dplayer, -1, x, y, z, wid);
@@ -882,7 +881,7 @@ public class LookupCommand {
 
                                                     String tag = Color.WHITE + "- ";
                                                     String phraseFinal = Phrase.build(Phrase.LOOKUP_USERNAME, Color.DARK_AQUA + user + Color.WHITE, Color.DARK_AQUA + username + Color.WHITE);
-                                                    ChatUtil.send(player2, command.getName(), "(a:username)", time, unixtimestamp, tag, phraseFinal);
+                                                    ChatUtil.send(data, player2, command.getName(), "(a:username)", time, unixtimestamp, tag, phraseFinal);
                                                     //Chat.sendComponent(player2, timeago + " " + Color.WHITE + "- " + Phrase.build(Phrase.LOOKUP_USERNAME, Color.DARK_AQUA + user + Color.WHITE, Color.DARK_AQUA + username + Color.WHITE));
                                                     PluginChannelListener.getInstance().sendUsernameData(player2, Integer.parseInt(time), user, username);
                                                 }
@@ -908,7 +907,7 @@ public class LookupCommand {
 
                                                     String tag = Color.WHITE + "- ";
                                                     String phraseFinal = Color.DARK_AQUA + dplayer + ": " + Color.WHITE + message;
-                                                    ChatUtil.send(player2, command.getName(), wid, x, y, z, true, true, "(a:sign)", time, unixtimestamp, tag, phraseFinal);
+                                                    ChatUtil.send(data, player2, command.getName(), wid, x, y, z, true, true, "(a:sign)", time, unixtimestamp, tag, phraseFinal);
                                                     //Chat.sendComponent(player2, timeago + " " + Color.WHITE + "- " + Color.DARK_AQUA + dplayer + ": " + Color.WHITE, message);
                                                     //Chat.sendComponent(player2, Color.WHITE + leftPadding + Color.GREY + "^ " + Util.getCoordinates(command.getName(), wid, x, y, z, true, true) + "");
                                                     PluginChannelListener.getInstance().sendMessageData(player2, Integer.parseInt(time), dplayer, message, true, x, y, z, wid);
@@ -961,7 +960,7 @@ public class LookupCommand {
                                                     }
 
                                                     String phraseFinal = Phrase.build(Phrase.LOOKUP_CONTAINER, Color.DARK_AQUA + rbd + dplayer + Color.WHITE + rbd, "x" + amount, Util.createTooltip(Color.DARK_AQUA + rbd + dname, tooltip) + Color.WHITE, selector);
-                                                    ChatUtil.send(player2, command.getName(), wid, x, y, z, true, true, "(a:inventory)", time, unixtimestamp, tag, phraseFinal, tooltip);
+                                                    ChatUtil.send(data, player2, command.getName(), wid, x, y, z, true, true, "(a:inventory)", time, unixtimestamp, tag, phraseFinal, tooltip);
                                                     //Chat.sendComponent(player2, timeago + " " + tag + " " + Phrase.build(Phrase.LOOKUP_CONTAINER, Color.DARK_AQUA + rbd + dplayer + Color.WHITE + rbd, "x" + amount, Util.createTooltip(Color.DARK_AQUA + rbd + dname, tooltip) + Color.WHITE, selector));
                                                     PluginChannelListener.getInstance().sendData(player2, Integer.parseInt(time), Phrase.LOOKUP_CONTAINER, selector, dplayer, dname, amount, x, y, z, wid, rbd, true, tag.contains("+"));
                                                 }
@@ -1060,7 +1059,7 @@ public class LookupCommand {
 
                                                         action = (finalArgAction.size() == 0 ? " (" + action + ")" : "");
                                                         String phraseFinal = Phrase.build(phrase, Color.DARK_AQUA + rbd + dplayer + Color.WHITE + rbd, "x" + amount, Util.createTooltip(Color.DARK_AQUA + rbd + dname, tooltip) + Color.WHITE, selector);
-                                                        ChatUtil.send(player2, command.getName(), wid, x, y, z, true, true, action, time, unixtimestamp, tag, phraseFinal, tooltip);
+                                                        ChatUtil.send(data, player2, command.getName(), wid, x, y, z, true, true, action, time, unixtimestamp, tag, phraseFinal, tooltip);
                                                         //Chat.sendComponent(player2, timeago + " " + tag + " " + Phrase.build(phrase, Color.DARK_AQUA + rbd + dplayer + Color.WHITE + rbd, "x" + amount, Util.createTooltip(Color.DARK_AQUA + rbd + dname, tooltip) + Color.WHITE, selector));
                                                         PluginChannelListener.getInstance().sendData(player2, Integer.parseInt(time), phrase, selector, dplayer, dname, (tag.contains("+") ? 1 : -1), x, y, z, wid, rbd, action.contains("container"), tag.contains("+"));
                                                     }
@@ -1079,7 +1078,7 @@ public class LookupCommand {
 
                                                         action = (finalArgAction.size() == 0 ? " (" + action + ")" : "");
                                                         String phraseFinal = Phrase.build(phrase, Color.DARK_AQUA + rbd + dplayer + Color.WHITE + rbd, Color.DARK_AQUA + rbd + dname + Color.WHITE, selector);
-                                                        ChatUtil.send(player2, command.getName(), wid, x, y, z, true, true, action, time, unixtimestamp, tag, phraseFinal);
+                                                        ChatUtil.send(data, player2, command.getName(), wid, x, y, z, true, true, action, time, unixtimestamp, tag, phraseFinal);
                                                         //Chat.sendComponent(player2, timeago + " " + tag + " " + Phrase.build(phrase, Color.DARK_AQUA + rbd + dplayer + Color.WHITE + rbd, Color.DARK_AQUA + rbd + dname + Color.WHITE, selector));
                                                         PluginChannelListener.getInstance().sendData(player2, Integer.parseInt(time), phrase, selector, dplayer, dname, (tag.contains("+") ? 1 : -1), x, y, z, wid, rbd, false, tag.contains("+"));
                                                     }
