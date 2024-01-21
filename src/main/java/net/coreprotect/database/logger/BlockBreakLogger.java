@@ -40,6 +40,10 @@ public class BlockBreakLogger {
                 return;
             }
 
+            if (ConfigHandler.blacklist.get(checkType.getKey().toString()) != null) {
+                return;
+            }
+
             if (!user.startsWith("#")) {
                 CacheHandler.spreadCache.remove(location);
             }
