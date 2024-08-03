@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
+import net.coreprotect.utility.eden.JsonBuilder;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -307,9 +308,10 @@ public final class PlayerInteractListener extends Queue implements Listener {
                                 try (Connection connection = Database.getConnection(true)) {
                                     if (connection != null) {
                                         Statement statement = connection.createStatement();
-                                        List<String> blockData = ChestTransactionLookup.performLookup(null, statement, finalLocation, player, 1, 7, false);
-                                        for (String data : blockData) {
-                                            Chat.sendComponent(player, data);
+                                        List<JsonBuilder> blockData = ChestTransactionLookup.performLookup(null, statement, finalLocation, player, 1, 7, false);
+                                        for (JsonBuilder json : blockData) {
+                                            json.send(player);
+                                            //Chat.sendComponent(player, data);
                                         }
 
                                         statement.close();

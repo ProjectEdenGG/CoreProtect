@@ -50,15 +50,15 @@ public class ChatUtil {
 
         List<String> dataFinal = Arrays.stream(data).filter(line -> line != null && !line.isEmpty()).toList();
 
-        new JsonBuilder().group()
-                .next(timeSince).hover(formattedTime).group()
-                .next(" " + tag + " ").group()
-                .next(phrase).hover(phraseHoverFinal).command(teleportCommand).group()
-                //.next(" [Data]").hover(dataFinal).group()
-                .send(player);
+        new JsonBuilder()
+            .next(timeSince).hover(formattedTime).group()
+            .next(" " + tag + " ").group()
+            .next(phrase).hover(phraseHoverFinal).command(teleportCommand).group()
+            //.next(" [Data]").hover(dataFinal).group()
+            .send(player);
     }
 
-    private static String getTimeSince(long resultTime, long currentTime) {
+    public static String getTimeSince(long resultTime, long currentTime) {
         StringBuilder message = new StringBuilder();
         double timeSince = currentTime - (resultTime + 0.00);
         if (timeSince < 0.00) {
@@ -88,7 +88,7 @@ public class ChatUtil {
         return message.toString();
     }
 
-    private static String getFormattedTime(long time){
+    public static String getFormattedTime(long time){
         return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z").format(new Date(time * 1000L));
     }
 }

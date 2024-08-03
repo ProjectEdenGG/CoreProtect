@@ -10,6 +10,7 @@ import java.util.Locale;
 import java.util.Map;
 
 import net.coreprotect.utility.eden.ChatUtil;
+import net.coreprotect.utility.eden.JsonBuilder;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -358,9 +359,10 @@ public class LookupCommand {
                         ConfigHandler.lookupThrottle.put(player2.getName(), new Object[] { true, System.currentTimeMillis() });
                         if (connection != null) {
                             Statement statement = connection.createStatement();
-                            List<String> blockData = ChestTransactionLookup.performLookup(command.getName(), statement, location, player2, p2, finalLimit, false);
-                            for (String data : blockData) {
-                                Chat.sendComponent(player2, data);
+                            List<JsonBuilder> blockData = ChestTransactionLookup.performLookup(command.getName(), statement, location, player2, p2, finalLimit, false);
+                            for (JsonBuilder json : blockData) {
+                                json.send(player2);
+                                //Chat.sendComponent(player2, data);
                             }
                             statement.close();
                         }
@@ -1058,7 +1060,7 @@ public class LookupCommand {
                                                         }
 
                                                         action = (finalArgAction.size() == 0 ? " (" + action + ")" : "");
-                                                        String phraseFinal = Phrase.build(phrase, Color.DARK_AQUA + rbd + dplayer + Color.WHITE + rbd, "x" + amount, Util.createTooltip(Color.DARK_AQUA + rbd + dname, tooltip) + Color.WHITE, selector);
+                                                        String phraseFinal = Phrase.build(phrase, Color.DARK_AQUA + rbd + dplayer + Color.WHITE + rbd, "x" + amount, Color.DARK_AQUA + rbd + dname + Color.WHITE, selector);
                                                         ChatUtil.send(data, player2, command.getName(), wid, x, y, z, true, true, action, time, unixtimestamp, tag, phraseFinal, tooltip);
                                                         //Chat.sendComponent(player2, timeago + " " + tag + " " + Phrase.build(phrase, Color.DARK_AQUA + rbd + dplayer + Color.WHITE + rbd, "x" + amount, Util.createTooltip(Color.DARK_AQUA + rbd + dname, tooltip) + Color.WHITE, selector));
                                                         PluginChannelListener.getInstance().sendData(player2, Integer.parseInt(time), phrase, selector, dplayer, dname, (tag.contains("+") ? 1 : -1), x, y, z, wid, rbd, action.contains("container"), tag.contains("+"));

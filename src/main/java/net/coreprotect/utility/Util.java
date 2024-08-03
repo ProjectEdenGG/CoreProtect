@@ -19,6 +19,7 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import net.coreprotect.utility.eden.JsonBuilder;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -117,6 +118,24 @@ public class Util extends Queue {
         return getBlockId(material.name(), true);
     }
 
+    public static String getTeleportCommand(String command, int worldId, int x, int y, int z, boolean displayWorld, boolean italic){
+        return "/" + command + " teleport wid:" + worldId + " " + (x + 0.50) + " " + y + " " + (z + 0.50);
+    }
+
+    public static String getCoordinatesRaw(int worldId, int x, int y, int z, boolean displayWorld, boolean italic){
+        StringBuilder message = new StringBuilder();
+
+        StringBuilder worldDisplay = new StringBuilder();
+        if (displayWorld) {
+            worldDisplay.append("/" + Util.getWorldName(worldId));
+        }
+
+        // chat output
+        message.append(Color.GREY + (italic ? Color.ITALIC : "") + "(x" + x + "/y" + y + "/z" + z + worldDisplay.toString() + ")");
+
+        return message.toString();
+    }
+
     public static String getCoordinates(String command, int worldId, int x, int y, int z, boolean displayWorld, boolean italic) {
         StringBuilder message = new StringBuilder(Chat.COMPONENT_TAG_OPEN + Chat.COMPONENT_COMMAND);
 
@@ -132,6 +151,103 @@ public class Util extends Queue {
         message.append(Color.GREY + (italic ? Color.ITALIC : "") + "(x" + x + "/y" + y + "/z" + z + worldDisplay.toString() + ")");
 
         return message.append(Chat.COMPONENT_TAG_CLOSE).toString();
+    }
+
+    public static JsonBuilder getPageNavigationJson(String command, int page, int totalPages) {
+        JsonBuilder json = new JsonBuilder();
+
+        // back arrow
+        if (page > 1) {
+            String pageCommand = "/" + command + " l " + (page - 1);
+            json.next(Color.WHITE + "◀ ").hover(pageCommand).command(pageCommand).group();
+        }
+
+        json.next(Color.DARK_AQUA + Phrase.build(Phrase.LOOKUP_PAGE, Color.WHITE + page + "/" + totalPages) + " ").group();
+
+        // next arrow
+        if (page < totalPages) {
+            String pageCommand = "/" + command + " l " + (page + 1);
+            json.next(Color.WHITE + "▶ ").hover(pageCommand).command(pageCommand).group();
+        }
+
+        if (totalPages > 1) {
+            json.next(Color.GREY + "(").group();
+
+            if (page > 3) {
+                String pageCommand = "/" + command + " l " + 1;
+                json.next(Color.WHITE + "1").hover(pageCommand).command(pageCommand).group();
+                if (page > 4 && totalPages > 7) {
+                    json.next(Color.GREY + "... ").group();
+                }
+                else {
+                    json.next(Color.GREY + "| ").group();
+                }
+            }
+
+            int displayStart = Math.max((page - 2), 1);
+            int displayEnd = Math.min((page + 2), totalPages);
+            if (page > 999 || (page > 101 && totalPages > 99999)) { // limit to max 5 page numbers
+                displayStart = (displayStart + 1) < displayEnd ? (displayStart + 1) : displayStart;
+                displayEnd = (displayEnd - 1) > displayStart ? (displayEnd - 1) : displayEnd;
+                if (displayStart > (totalPages - 3)) {
+                    displayStart = Math.max((totalPages - 3), 1);
+                }
+            }
+            else { // display at least 7 page numbers
+                if (displayStart > (totalPages - 5)) {
+                    displayStart = Math.max((totalPages - 5), 1);
+                }
+                if (displayEnd < 6) {
+                    displayEnd = Math.min(6, totalPages);
+                }
+            }
+
+            if (page > 99999) { // limit to max 3 page numbers
+                displayStart = (displayStart + 1) < displayEnd ? (displayStart + 1) : displayStart;
+                displayEnd = (displayEnd - 1) >= displayStart ? (displayEnd - 1) : displayEnd;
+                if (page == (totalPages - 1)) {
+                    displayEnd = totalPages - 1;
+                }
+                if (displayStart < displayEnd) {
+                    displayStart = displayEnd;
+                }
+            }
+
+            if (page > 3 && displayStart == 1) {
+                displayStart = 2;
+            }
+
+            for (int displayPage = displayStart; displayPage <= displayEnd; displayPage++) {
+                if (page != displayPage) {
+                    String pageCommand = "/" + command + " l " + displayPage;
+                    json.next(Color.WHITE + displayPage + (displayPage < totalPages ? " " : "")).hover(pageCommand).command(pageCommand).group();
+                } else {
+                    json.next(Color.WHITE + Color.UNDERLINE + displayPage + Color.RESET + (displayPage < totalPages ? " " : "")).group();
+                }
+                if (displayPage < displayEnd) {
+                    json.next(Color.GREY + "| ").group();
+                }
+            }
+
+            if (displayEnd < totalPages) {
+                if (displayEnd < (totalPages - 1)) {
+                    json.next(Color.GREY + "... ").group();
+                } else {
+                    json.next(Color.GREY + "| ").group();
+                }
+                if (page != totalPages) {
+                    String pageCommand = "/" + command + " l " + totalPages;
+                    json.next(Color.WHITE + totalPages).hover(pageCommand).command(pageCommand).group();
+                }
+                else {
+                    json.next(Color.WHITE + Color.UNDERLINE + totalPages).group();
+                }
+            }
+
+            json.next(Color.GREY + ")").group();
+        }
+
+        return json.group();
     }
 
     public static String getPageNavigation(String command, int page, int totalPages) {
@@ -164,21 +280,21 @@ public class Util extends Queue {
                 }
             }
 
-            int displayStart = (page - 2) < 1 ? 1 : (page - 2);
-            int displayEnd = (page + 2) > totalPages ? totalPages : (page + 2);
+            int displayStart = Math.max((page - 2), 1);
+            int displayEnd = Math.min((page + 2), totalPages);
             if (page > 999 || (page > 101 && totalPages > 99999)) { // limit to max 5 page numbers
                 displayStart = (displayStart + 1) < displayEnd ? (displayStart + 1) : displayStart;
                 displayEnd = (displayEnd - 1) > displayStart ? (displayEnd - 1) : displayEnd;
                 if (displayStart > (totalPages - 3)) {
-                    displayStart = (totalPages - 3) < 1 ? 1 : (totalPages - 3);
+                    displayStart = Math.max((totalPages - 3), 1);
                 }
             }
             else { // display at least 7 page numbers
                 if (displayStart > (totalPages - 5)) {
-                    displayStart = (totalPages - 5) < 1 ? 1 : (totalPages - 5);
+                    displayStart = Math.max((totalPages - 5), 1);
                 }
                 if (displayEnd < 6) {
-                    displayEnd = 6 > totalPages ? totalPages : 6;
+                    displayEnd = Math.min(6, totalPages);
                 }
             }
 
@@ -267,6 +383,13 @@ public class Util extends Queue {
         return message.toString();
     }
 
+    public ItemStack getItemstack(byte[] metadata, int type, int amount){
+        ItemStack item = new ItemStack(Util.getType(type), amount);
+        item = (ItemStack) Rollback.populateItemStack(item, metadata)[2];
+
+        return item;
+    }
+
     public static String getEnchantments(byte[] metadata, int type, int amount) {
         if (metadata == null) {
             return "";
@@ -279,11 +402,13 @@ public class Util extends Queue {
 
         List<String> enchantments = ItemMetaHandler.getEnchantments(item, displayName);
         for (String enchantment : enchantments) {
-            if (message.length() > 0) {
+            if (!message.isEmpty()) {
                 message.append("\n");
             }
+
             message.append(enchantment);
         }
+
 
         if (!displayName.isEmpty()) {
             message.insert(0, enchantments.isEmpty() ? Color.WHITE : Color.AQUA);

@@ -71,7 +71,7 @@ public class StringUtils {
                 boolean append = Math.abs(length - oldLength) >= Math.abs(length - newLength);
                 if (!append) {
                     String newline = line.toString().trim();
-                    add(line.toString().trim());
+                    add(newline);
                     line = new StringBuilder(getLastColor(newline));
                 }
 

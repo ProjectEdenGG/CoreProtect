@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+import net.coreprotect.utility.eden.ChatUtil;
+import net.coreprotect.utility.eden.JsonBuilder;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
@@ -20,8 +22,8 @@ import net.coreprotect.utility.Util;
 
 public class ChestTransactionLookup {
 
-    public static List<String> performLookup(String command, Statement statement, Location l, CommandSender commandSender, int page, int limit, boolean exact) {
-        List<String> result = new ArrayList<>();
+    public static List<JsonBuilder> performLookup(String command, Statement statement, Location l, CommandSender commandSender, int page, int limit, boolean exact) {
+        List<JsonBuilder> result = new ArrayList<>();
 
         try {
             if (l == null) {
@@ -90,10 +92,16 @@ public class ChestTransactionLookup {
                 }
 
                 String resultUser = ConfigHandler.playerIdCacheReversed.get(resultUserId);
-                String timeAgo = Util.getTimeSince(resultTime, time, true);
+                String timeAgo = Util.getTimeSince(resultTime, time, false);
 
                 if (!found) {
-                    result.add(new StringBuilder(Color.WHITE + "----- " + Color.DARK_AQUA + Phrase.build(Phrase.CONTAINER_HEADER) + Color.WHITE + " ----- " + Util.getCoordinates(command, worldId, x, y, z, false, false)).toString());
+                    String teleportCommand = Util.getTeleportCommand(command, worldId, x, y, z, false, false);
+                    String coordinates = Util.getCoordinatesRaw(worldId, x, y, z, false, false);
+                    result.add(
+                       new JsonBuilder(Color.WHITE + "----- " + Color.DARK_AQUA + Phrase.build(Phrase.CONTAINER_HEADER) + Color.WHITE + " ----- ").group()
+                           .next(coordinates).hover(teleportCommand).command(teleportCommand).group()
+                   );
+                   //result.add(new StringBuilder(Color.WHITE + "----- " + Color.DARK_AQUA + Phrase.build(Phrase.CONTAINER_HEADER) + Color.WHITE + " ----- " + Util.getCoordinates(command, worldId, x, y, z, false, false)).toString());
                 }
                 found = true;
 
@@ -119,23 +127,38 @@ public class ChestTransactionLookup {
                     target = target.split(":")[1];
                 }
 
-                result.add(new StringBuilder(timeAgo + " " + tag + " " + Phrase.build(Phrase.LOOKUP_CONTAINER, Color.DARK_AQUA + rbFormat + resultUser + Color.WHITE + rbFormat, "x" + resultAmount, Util.createTooltip(Color.DARK_AQUA + rbFormat + target, tooltip) + Color.WHITE, selector)).toString());
+                String phraseFinal = Phrase.build(Phrase.LOOKUP_CONTAINER, Color.DARK_AQUA + rbFormat + resultUser + Color.WHITE + rbFormat, "x" + resultAmount, Color.WHITE, selector);
+                String formattedTime = Color.GREY + ChatUtil.getFormattedTime(resultTime);
+
+                JsonBuilder json = new JsonBuilder().group()
+                    .next(timeAgo).hover(formattedTime).group()
+                    .next(" " + tag + " ").group()
+                    .next(phraseFinal).group()
+                    .next(Color.DARK_AQUA + rbFormat + target).hover(tooltip).hover("\n" + Color.GREY + "(a:container)").group();
+
+                result.add(json);
+
+                //result.add(new StringBuilder(timeAgo + " " + tag + " " + Phrase.build(Phrase.LOOKUP_CONTAINER, Color.DARK_AQUA + rbFormat + resultUser + Color.WHITE + rbFormat, "x" + resultAmount, Util.createTooltip(Color.DARK_AQUA + rbFormat + target, tooltip) + Color.WHITE, selector)).toString());
                 PluginChannelListener.getInstance().sendData(commandSender, resultTime, Phrase.LOOKUP_CONTAINER, selector, resultUser, target, resultAmount, x, y, z, worldId, rbFormat, true, tag.contains("+"));
             }
             results.close();
 
             if (found) {
                 if (count > limit) {
-                    result.add(Color.WHITE + "-----");
-                    result.add(Util.getPageNavigation(command, page, totalPages));
+                    result.add(new JsonBuilder(Color.WHITE + "-----"));
+                    result.add(new JsonBuilder(Util.getPageNavigationJson(command, page, totalPages)));
+                    //result.add(Color.WHITE + "-----");
+                    //result.add(Util.getPageNavigation(command, page, totalPages));
                 }
             }
             else {
                 if (rowMax > count && count > 0) {
-                    result.add(Color.DARK_AQUA + "CoreProtect " + Color.WHITE + "- " + Phrase.build(Phrase.NO_RESULTS_PAGE, Selector.SECOND));
+                    result.add(new JsonBuilder(Color.DARK_AQUA + "CoreProtect " + Color.WHITE + "- " + Phrase.build(Phrase.NO_RESULTS_PAGE, Selector.SECOND)));
+                    //result.add(Color.DARK_AQUA + "CoreProtect " + Color.WHITE + "- " + Phrase.build(Phrase.NO_RESULTS_PAGE, Selector.SECOND));
                 }
                 else {
-                    result.add(Color.DARK_AQUA + "CoreProtect " + Color.WHITE + "- " + Phrase.build(Phrase.NO_DATA_LOCATION, Selector.SECOND));
+                    result.add(new JsonBuilder(Color.DARK_AQUA + "CoreProtect " + Color.WHITE + "- " + Phrase.build(Phrase.NO_DATA_LOCATION, Selector.SECOND)));
+                    //result.add(Color.DARK_AQUA + "CoreProtect " + Color.WHITE + "- " + Phrase.build(Phrase.NO_DATA_LOCATION, Selector.SECOND));
                 }
             }
 
