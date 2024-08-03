@@ -383,7 +383,7 @@ public class Util extends Queue {
         return message.toString();
     }
 
-    public ItemStack getItemstack(byte[] metadata, int type, int amount){
+    public static ItemStack getItemstack(byte[] metadata, int type, int amount){
         ItemStack item = new ItemStack(Util.getType(type), amount);
         item = (ItemStack) Rollback.populateItemStack(item, metadata)[2];
 
@@ -395,8 +395,7 @@ public class Util extends Queue {
             return "";
         }
 
-        ItemStack item = new ItemStack(Util.getType(type), amount);
-        item = (ItemStack) Rollback.populateItemStack(item, metadata)[2];
+		ItemStack item = getItemstack(metadata, type, amount);
         String displayName = item.hasItemMeta() && item.getItemMeta().hasDisplayName() ? item.getItemMeta().getDisplayName() : "";
         StringBuilder message = new StringBuilder(Color.ITALIC + displayName + Color.GREY);
 

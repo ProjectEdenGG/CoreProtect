@@ -352,7 +352,8 @@ public class LookupCommand {
             final int p2 = p;
             final int finalLimit = re;
 
-            class BasicThread implements Runnable {
+            @SuppressWarnings("CallToPrintStackTrace")
+			class BasicThread implements Runnable {
                 @Override
                 public void run() {
                     try (Connection connection = Database.getConnection(true)) {
@@ -362,7 +363,6 @@ public class LookupCommand {
                             List<JsonBuilder> blockData = ChestTransactionLookup.performLookup(command.getName(), statement, location, player2, p2, finalLimit, false);
                             for (JsonBuilder json : blockData) {
                                 json.send(player2);
-                                //Chat.sendComponent(player2, data);
                             }
                             statement.close();
                         }
@@ -444,7 +444,8 @@ public class LookupCommand {
             final int p2 = page;
             final int finalLimit = re;
             final int t = type;
-            class BasicThread implements Runnable {
+            @SuppressWarnings("CallToPrintStackTrace")
+			class BasicThread implements Runnable {
                 @Override
                 public void run() {
                     try (Connection connection = Database.getConnection(true)) {
@@ -718,7 +719,8 @@ public class LookupCommand {
                     final List<Integer> finalArgAction = argAction;
                     final boolean finalCount = count;
 
-                    class BasicThread2 implements Runnable {
+                    @SuppressWarnings({"CallToPrintStackTrace", "ConcatenationWithEmptyString"})
+					class BasicThread2 implements Runnable {
                         @Override
                         public void run() {
                             try (Connection connection = Database.getConnection(true)) {
@@ -831,13 +833,19 @@ public class LookupCommand {
                                                     String time = data[0];
                                                     String dplayer = data[1];
                                                     String message = data[2];
-                                                    String timeago = Util.getTimeSince(Integer.parseInt(time), unixtimestamp, true);
 
                                                     String tag = Color.WHITE + "- ";
                                                     String phraseFinal = Color.DARK_AQUA + dplayer + ": " + Color.WHITE + message;
                                                     String action = finalArgAction.contains(6) ? "(a:chat)" : "(a:command)";
-                                                    ChatUtil.send(data, player2, command.getName(), action, time, unixtimestamp, tag, phraseFinal);
-                                                    //Chat.sendComponent(player2, timeago + " " + Color.WHITE + "- " + Color.DARK_AQUA + dplayer + ": " + Color.WHITE, message);
+                                                    String formattedTime = Color.GREY + ChatUtil.getFormattedTime(Integer.parseInt(time));
+                                                    String timeAgo = Util.getTimeSince(Integer.parseInt(time), unixtimestamp, false);
+
+                                                    new JsonBuilder()
+                                                        .next(timeAgo).hover(formattedTime).group()
+                                                        .next(" " + tag + " ").group()
+                                                        .next(phraseFinal).hover(Color.GREY + action.trim()).group()
+                                                        .send(player2);
+
                                                     if (PluginChannelHandshakeListener.getInstance().isPluginChannelPlayer(player2)) {
                                                         int wid = Integer.parseInt(data[3]);
                                                         int x = Integer.parseInt(data[4]);
@@ -856,21 +864,20 @@ public class LookupCommand {
                                                     int y = Integer.parseInt(data[4]);
                                                     int z = Integer.parseInt(data[5]);
                                                     int action = Integer.parseInt(data[6]);
-                                                    String timeago = Util.getTimeSince(Integer.parseInt(time), unixtimestamp, true);
-                                                    int timeLength = 50 + (Util.getTimeSince(Integer.parseInt(time), unixtimestamp, false).replaceAll("[^0-9]", "").length() * 6);
-                                                    String leftPadding = Color.BOLD + Strings.padStart("", 10, ' ');
-                                                    if (timeLength % 4 == 0) {
-                                                        leftPadding = Strings.padStart("", timeLength / 4, ' ');
-                                                    }
-                                                    else {
-                                                        leftPadding = leftPadding + Color.WHITE + Strings.padStart("", (timeLength - 50) / 4, ' ');
-                                                    }
 
                                                     String tag = (action != 0 ? Color.GREEN + "+" : Color.RED + "-");
                                                     String phraseFinal = Phrase.build(Phrase.LOOKUP_LOGIN, Color.DARK_AQUA + dplayer + Color.WHITE, (action != 0 ? Selector.FIRST : Selector.SECOND));
-                                                    ChatUtil.send(data, player2, command.getName(), wid, x, y, z, true, true, "(a:session)", time, unixtimestamp, tag, phraseFinal);
-                                                    //Chat.sendComponent(player2, timeago + " " + tag + " " + Color.DARK_AQUA + Phrase.build(Phrase.LOOKUP_LOGIN, Color.DARK_AQUA + dplayer + Color.WHITE, (action != 0 ? Selector.FIRST : Selector.SECOND)));
-                                                    //Chat.sendComponent(player2, Color.WHITE + leftPadding + Color.GREY + "^ " + Util.getCoordinates(command.getName(), wid, x, y, z, true, true) + "");
+                                                    String formattedTime = Color.GREY + ChatUtil.getFormattedTime(Integer.parseInt(time));
+                                                    String timeAgo = Util.getTimeSince(Integer.parseInt(time), unixtimestamp, false);
+                                                    String coords = ChatUtil.getCoords(x, y, z, wid, true, true);
+                                                    String teleportCommand = ChatUtil.getTeleportCommand(command.getName(), x, y, z, wid);
+
+                                                    new JsonBuilder()
+                                                        .next(timeAgo).hover(formattedTime).command(teleportCommand).group()
+                                                        .next(" " + tag + " ").command(teleportCommand).group()
+                                                        .next(phraseFinal).hover(Color.GREY + action + "\n" + coords).command(teleportCommand).group()
+                                                        .send(player2);
+
                                                     PluginChannelListener.getInstance().sendInfoData(player2, Integer.parseInt(time), Phrase.LOOKUP_LOGIN, (action != 0 ? Selector.FIRST : Selector.SECOND), dplayer, -1, x, y, z, wid);
                                                 }
                                             }
@@ -879,12 +886,18 @@ public class LookupCommand {
                                                     String time = data[0];
                                                     String user = ConfigHandler.uuidCacheReversed.get(data[1]);
                                                     String username = data[2];
-                                                    String timeago = Util.getTimeSince(Integer.parseInt(time), unixtimestamp, true);
 
                                                     String tag = Color.WHITE + "- ";
                                                     String phraseFinal = Phrase.build(Phrase.LOOKUP_USERNAME, Color.DARK_AQUA + user + Color.WHITE, Color.DARK_AQUA + username + Color.WHITE);
-                                                    ChatUtil.send(data, player2, command.getName(), "(a:username)", time, unixtimestamp, tag, phraseFinal);
-                                                    //Chat.sendComponent(player2, timeago + " " + Color.WHITE + "- " + Phrase.build(Phrase.LOOKUP_USERNAME, Color.DARK_AQUA + user + Color.WHITE, Color.DARK_AQUA + username + Color.WHITE));
+                                                    String formattedTime = Color.GREY + ChatUtil.getFormattedTime(Integer.parseInt(time));
+                                                    String timeAgo = Util.getTimeSince(Integer.parseInt(time), unixtimestamp, false);
+
+                                                    new JsonBuilder()
+                                                        .next(timeAgo).hover(formattedTime).group()
+                                                        .next(" " + tag + " ").group()
+                                                        .next(phraseFinal).hover(Color.GREY + "(a:username)").group()
+                                                        .send(player2);
+
                                                     PluginChannelListener.getInstance().sendUsernameData(player2, Integer.parseInt(time), user, username);
                                                 }
                                             }
@@ -897,21 +910,20 @@ public class LookupCommand {
                                                     int y = Integer.parseInt(data[4]);
                                                     int z = Integer.parseInt(data[5]);
                                                     String message = data[6];
-                                                    String timeago = Util.getTimeSince(Integer.parseInt(time), unixtimestamp, true);
-                                                    int timeLength = 50 + (Util.getTimeSince(Integer.parseInt(time), unixtimestamp, false).replaceAll("[^0-9]", "").length() * 6);
-                                                    String leftPadding = Color.BOLD + Strings.padStart("", 10, ' ');
-                                                    if (timeLength % 4 == 0) {
-                                                        leftPadding = Strings.padStart("", timeLength / 4, ' ');
-                                                    }
-                                                    else {
-                                                        leftPadding = leftPadding + Color.WHITE + Strings.padStart("", (timeLength - 50) / 4, ' ');
-                                                    }
 
                                                     String tag = Color.WHITE + "- ";
                                                     String phraseFinal = Color.DARK_AQUA + dplayer + ": " + Color.WHITE + message;
-                                                    ChatUtil.send(data, player2, command.getName(), wid, x, y, z, true, true, "(a:sign)", time, unixtimestamp, tag, phraseFinal);
-                                                    //Chat.sendComponent(player2, timeago + " " + Color.WHITE + "- " + Color.DARK_AQUA + dplayer + ": " + Color.WHITE, message);
-                                                    //Chat.sendComponent(player2, Color.WHITE + leftPadding + Color.GREY + "^ " + Util.getCoordinates(command.getName(), wid, x, y, z, true, true) + "");
+                                                    String formattedTime = Color.GREY + ChatUtil.getFormattedTime(Integer.parseInt(time));
+                                                    String timeAgo = Util.getTimeSince(Integer.parseInt(time), unixtimestamp, false);
+                                                    String coords = ChatUtil.getCoords(x, y, z, wid, true, true);
+                                                    String teleportCommand = ChatUtil.getTeleportCommand(command.getName(), x, y, z, wid);
+
+                                                    new JsonBuilder()
+                                                        .next(timeAgo).hover(formattedTime).command(teleportCommand).group()
+                                                        .next(" " + tag + " ").command(teleportCommand).group()
+                                                        .next(phraseFinal).hover(Color.GREY + "(a:sign)\n" + coords).command(teleportCommand).group()
+                                                        .send(player2);
+
                                                     PluginChannelListener.getInstance().sendMessageData(player2, Integer.parseInt(time), dplayer, message, true, x, y, z, wid);
                                                 }
                                             }
@@ -928,11 +940,10 @@ public class LookupCommand {
                                                     int y = Integer.parseInt(data[3]);
                                                     int z = Integer.parseInt(data[4]);
                                                     String rbd = ((Integer.parseInt(data[8]) == 2 || Integer.parseInt(data[8]) == 3) ? Color.STRIKETHROUGH : "");
-                                                    String timeago = Util.getTimeSince(Integer.parseInt(time), unixtimestamp, true);
+                                                    String timeAgo = Util.getTimeSince(Integer.parseInt(time), unixtimestamp, false);
                                                     Material blockType = Util.itemFilter(Util.getType(dtype), (Integer.parseInt(data[13]) == 0));
                                                     String dname = Util.nameFilter(blockType.name().toLowerCase(Locale.ROOT), ddata);
                                                     byte[] metadata = data[11] == null ? null : data[11].getBytes(StandardCharsets.ISO_8859_1);
-                                                    String tooltip = Util.getEnchantments(metadata, dtype, amount);
 
                                                     String selector = Selector.FIRST;
                                                     String tag = Color.WHITE + "-";
@@ -961,9 +972,18 @@ public class LookupCommand {
                                                         tag = (daction == 0 ? Color.GREEN + "+" : Color.RED + "-");
                                                     }
 
-                                                    String phraseFinal = Phrase.build(Phrase.LOOKUP_CONTAINER, Color.DARK_AQUA + rbd + dplayer + Color.WHITE + rbd, "x" + amount, Util.createTooltip(Color.DARK_AQUA + rbd + dname, tooltip) + Color.WHITE, selector);
-                                                    ChatUtil.send(data, player2, command.getName(), wid, x, y, z, true, true, "(a:inventory)", time, unixtimestamp, tag, phraseFinal, tooltip);
-                                                    //Chat.sendComponent(player2, timeago + " " + tag + " " + Phrase.build(Phrase.LOOKUP_CONTAINER, Color.DARK_AQUA + rbd + dplayer + Color.WHITE + rbd, "x" + amount, Util.createTooltip(Color.DARK_AQUA + rbd + dname, tooltip) + Color.WHITE, selector));
+                                                    String phraseFinal = Phrase.build(Phrase.LOOKUP_CONTAINER, Color.DARK_AQUA + rbd + dplayer + Color.WHITE + rbd, "x" + amount, Color.WHITE, selector);
+                                                    String formattedTime = Color.GREY + ChatUtil.getFormattedTime(Integer.parseInt(time));
+                                                    String coords = ChatUtil.getCoords(x, y, z, wid, true, true);
+                                                    String teleportCommand = ChatUtil.getTeleportCommand(command.getName(), x, y, z, wid);
+
+                                                    new JsonBuilder()
+                                                        .next(timeAgo).hover(formattedTime).command(teleportCommand).group()
+                                                        .next(" " + tag + " ").command(teleportCommand).group()
+                                                        .next(phraseFinal).hover(Color.GREY + "(a:inventory)\n" + coords).command(teleportCommand).group()
+                                                        .next(Color.DARK_AQUA + rbd + dname).hover(Util.getItemstack(metadata, dtype, amount)).command(teleportCommand).group()
+                                                        .send(player2);
+
                                                     PluginChannelListener.getInstance().sendData(player2, Integer.parseInt(time), Phrase.LOOKUP_CONTAINER, selector, dplayer, dname, amount, x, y, z, wid, rbd, true, tag.contains("+"));
                                                 }
                                             }
@@ -987,15 +1007,7 @@ public class LookupCommand {
                                                     int amount = Integer.parseInt(data[10]);
                                                     String tag = Color.WHITE + "-";
 
-                                                    String timeago = Util.getTimeSince(Integer.parseInt(time), unixtimestamp, true);
-                                                    int timeLength = 50 + (Util.getTimeSince(Integer.parseInt(time), unixtimestamp, false).replaceAll("[^0-9]", "").length() * 6);
-                                                    String leftPadding = Color.BOLD + Strings.padStart("", 10, ' ');
-                                                    if (timeLength % 4 == 0) {
-                                                        leftPadding = Strings.padStart("", timeLength / 4, ' ');
-                                                    }
-                                                    else {
-                                                        leftPadding = leftPadding + Color.WHITE + Strings.padStart("", (timeLength - 50) / 4, ' ');
-                                                    }
+                                                    String timeAgo = Util.getTimeSince(Integer.parseInt(time), unixtimestamp, false);
 
                                                     String dname = "";
                                                     boolean isPlayer = false;
@@ -1025,14 +1037,11 @@ public class LookupCommand {
                                                         dname = blockNameSplit[1];
                                                     }
 
-                                                    // Functions.sendMessage(player2, timeago+" " + ChatColors.WHITE + "- " + ChatColors.DARK_AQUA+rbd+""+dplayer+" " + ChatColors.WHITE+rbd+""+a+" " + ChatColors.DARK_AQUA+rbd+"#"+dtype+ChatColors.WHITE + ". " + ChatColors.GREY + "(x"+x+"/y"+y+"/z"+z+")");
-
                                                     Phrase phrase = Phrase.LOOKUP_BLOCK;
                                                     String selector = Selector.FIRST;
                                                     String action = "a:block";
                                                     if (finalArgAction.contains(4) || finalArgAction.contains(5) || finalArgAction.contains(11) || amount > -1) {
                                                         byte[] metadata = data[11] == null ? null : data[11].getBytes(StandardCharsets.ISO_8859_1);
-                                                        String tooltip = Util.getEnchantments(metadata, dtype, amount);
 
                                                         if (daction == 2 || daction == 3) {
                                                             phrase = Phrase.LOOKUP_ITEM; // {picked up|dropped}
@@ -1060,9 +1069,18 @@ public class LookupCommand {
                                                         }
 
                                                         action = (finalArgAction.size() == 0 ? " (" + action + ")" : "");
-                                                        String phraseFinal = Phrase.build(phrase, Color.DARK_AQUA + rbd + dplayer + Color.WHITE + rbd, "x" + amount, Color.DARK_AQUA + rbd + dname + Color.WHITE, selector);
-                                                        ChatUtil.send(data, player2, command.getName(), wid, x, y, z, true, true, action, time, unixtimestamp, tag, phraseFinal, tooltip);
-                                                        //Chat.sendComponent(player2, timeago + " " + tag + " " + Phrase.build(phrase, Color.DARK_AQUA + rbd + dplayer + Color.WHITE + rbd, "x" + amount, Util.createTooltip(Color.DARK_AQUA + rbd + dname, tooltip) + Color.WHITE, selector));
+                                                        String phraseFinal = Phrase.build(phrase, Color.DARK_AQUA + rbd + dplayer + Color.WHITE + rbd, "x" + amount, Color.WHITE, selector);
+                                                        String formattedTime = Color.GREY + ChatUtil.getFormattedTime(Integer.parseInt(time));
+                                                        String coords = ChatUtil.getCoords(x, y, z, wid, true, true);
+                                                        String teleportCommand = ChatUtil.getTeleportCommand(command.getName(), x, y, z, wid);
+
+                                                        new JsonBuilder()
+                                                            .next(timeAgo).hover(formattedTime).command(teleportCommand).group()
+                                                            .next(" " + tag + " ").command(teleportCommand).group()
+                                                            .next(phraseFinal).hover(Color.GREY + action.trim() + "\n" + coords).command(teleportCommand).group()
+                                                            .next(Color.DARK_AQUA + rbd + dname).hover(Util.getItemstack(metadata, dtype, amount)).command(teleportCommand).group()
+                                                            .send(player2);
+
                                                         PluginChannelListener.getInstance().sendData(player2, Integer.parseInt(time), phrase, selector, dplayer, dname, (tag.contains("+") ? 1 : -1), x, y, z, wid, rbd, action.contains("container"), tag.contains("+"));
                                                     }
                                                     else {
@@ -1080,13 +1098,19 @@ public class LookupCommand {
 
                                                         action = (finalArgAction.size() == 0 ? " (" + action + ")" : "");
                                                         String phraseFinal = Phrase.build(phrase, Color.DARK_AQUA + rbd + dplayer + Color.WHITE + rbd, Color.DARK_AQUA + rbd + dname + Color.WHITE, selector);
-                                                        ChatUtil.send(data, player2, command.getName(), wid, x, y, z, true, true, action, time, unixtimestamp, tag, phraseFinal);
-                                                        //Chat.sendComponent(player2, timeago + " " + tag + " " + Phrase.build(phrase, Color.DARK_AQUA + rbd + dplayer + Color.WHITE + rbd, Color.DARK_AQUA + rbd + dname + Color.WHITE, selector));
+                                                        String formattedTime = Color.GREY + ChatUtil.getFormattedTime(Integer.parseInt(time));
+                                                        String coords = ChatUtil.getCoords(x, y, z, wid, true, true);
+                                                        String teleportCommand = ChatUtil.getTeleportCommand(command.getName(), x, y, z, wid);
+
+                                                        new JsonBuilder()
+                                                            .next(timeAgo).hover(formattedTime).command(teleportCommand).group()
+                                                            .next(" " + tag + " ").command(teleportCommand).group()
+                                                            .next(phraseFinal).hover(Color.GREY + action.trim() + "\n" + coords).command(teleportCommand).group()
+                                                            .send(player2);
+
                                                         PluginChannelListener.getInstance().sendData(player2, Integer.parseInt(time), phrase, selector, dplayer, dname, (tag.contains("+") ? 1 : -1), x, y, z, wid, rbd, false, tag.contains("+"));
                                                     }
 
-                                                    //action = (finalArgAction.size() == 0 ? " (" + action + ")" : "");
-                                                    //Chat.sendComponent(player2, Color.WHITE + leftPadding + Color.GREY + "^ " + Util.getCoordinates(command.getName(), wid, x, y, z, true, true) + Color.GREY + Color.ITALIC + action);
                                                 }
                                             }
                                             if (rows > displayResults) {
@@ -1129,21 +1153,17 @@ public class LookupCommand {
                 }
             }
             else {
-                // Functions.sendMessage(player, ChatColors.RED + "You did not specify a lookup radius.");
                 if (argUsers.size() == 0 && argBlocks.size() == 0 && (argWid > 0 || forceglobal)) {
                     Chat.sendMessage(player, Color.DARK_AQUA + "CoreProtect " + Color.WHITE + "- " + Phrase.build(Phrase.MISSING_LOOKUP_USER, Selector.FIRST));
                     return;
-                }
-                else if (argUsers.size() == 0 && argBlocks.size() == 0 && argRadius == null) {
+                } else if (argUsers.size() == 0 && argBlocks.size() == 0 && argRadius == null) {
                     Chat.sendMessage(player, Color.DARK_AQUA + "CoreProtect " + Color.WHITE + "- " + Phrase.build(Phrase.MISSING_LOOKUP_USER, Selector.SECOND));
                     return;
-                }
-                else {
+                } else {
                     Chat.sendMessage(player, Color.DARK_AQUA + "CoreProtect " + Color.WHITE + "- " + Phrase.build(Phrase.MISSING_PARAMETERS, "/co l <params>"));
                 }
             }
-        }
-        else {
+        } else {
             Chat.sendMessage(player, Color.DARK_AQUA + "CoreProtect " + Color.WHITE + "- " + Phrase.build(Phrase.MISSING_PARAMETERS, "/co l <params>"));
         }
     }

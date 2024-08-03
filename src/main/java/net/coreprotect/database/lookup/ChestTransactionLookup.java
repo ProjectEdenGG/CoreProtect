@@ -85,7 +85,6 @@ public class ChestTransactionLookup {
                 int resultAmount = results.getInt("amount");
                 int resultRolledBack = results.getInt("rolled_back");
                 byte[] resultMetadata = results.getBytes("metadata");
-                String tooltip = Util.getEnchantments(resultMetadata, resultType, resultAmount);
 
                 if (ConfigHandler.playerIdCacheReversed.get(resultUserId) == null) {
                     UserStatement.loadName(statement.getConnection(), resultUserId);
@@ -97,11 +96,8 @@ public class ChestTransactionLookup {
                 if (!found) {
                     String teleportCommand = Util.getTeleportCommand(command, worldId, x, y, z, false, false);
                     String coordinates = Util.getCoordinatesRaw(worldId, x, y, z, false, false);
-                    result.add(
-                       new JsonBuilder(Color.WHITE + "----- " + Color.DARK_AQUA + Phrase.build(Phrase.CONTAINER_HEADER) + Color.WHITE + " ----- ").group()
-                           .next(coordinates).hover(teleportCommand).command(teleportCommand).group()
-                   );
-                   //result.add(new StringBuilder(Color.WHITE + "----- " + Color.DARK_AQUA + Phrase.build(Phrase.CONTAINER_HEADER) + Color.WHITE + " ----- " + Util.getCoordinates(command, worldId, x, y, z, false, false)).toString());
+                    result.add(new JsonBuilder(Color.WHITE + "----- " + Color.DARK_AQUA + Phrase.build(Phrase.CONTAINER_HEADER) + Color.WHITE + " ----- ").group()
+                        .next(coordinates).hover(teleportCommand).command(teleportCommand).group());
                 }
                 found = true;
 
@@ -118,7 +114,7 @@ public class ChestTransactionLookup {
                 }
                 String target = resultMaterial.name().toLowerCase(Locale.ROOT);
                 target = Util.nameFilter(target, resultData);
-                if (target.length() > 0) {
+                if (!target.isEmpty()) {
                     target = "minecraft:" + target.toLowerCase(Locale.ROOT) + "";
                 }
 
@@ -130,15 +126,14 @@ public class ChestTransactionLookup {
                 String phraseFinal = Phrase.build(Phrase.LOOKUP_CONTAINER, Color.DARK_AQUA + rbFormat + resultUser + Color.WHITE + rbFormat, "x" + resultAmount, Color.WHITE, selector);
                 String formattedTime = Color.GREY + ChatUtil.getFormattedTime(resultTime);
 
-                JsonBuilder json = new JsonBuilder().group()
+                JsonBuilder json = new JsonBuilder()
                     .next(timeAgo).hover(formattedTime).group()
                     .next(" " + tag + " ").group()
-                    .next(phraseFinal).group()
-                    .next(Color.DARK_AQUA + rbFormat + target).hover(tooltip).hover("\n" + Color.GREY + "(a:container)").group();
+                    .next(phraseFinal).hover(Color.GREY + "(a:container)").group()
+                    .next(Color.DARK_AQUA + rbFormat + target).hover(Util.getItemstack(resultMetadata, resultType, resultAmount)).group();
 
                 result.add(json);
 
-                //result.add(new StringBuilder(timeAgo + " " + tag + " " + Phrase.build(Phrase.LOOKUP_CONTAINER, Color.DARK_AQUA + rbFormat + resultUser + Color.WHITE + rbFormat, "x" + resultAmount, Util.createTooltip(Color.DARK_AQUA + rbFormat + target, tooltip) + Color.WHITE, selector)).toString());
                 PluginChannelListener.getInstance().sendData(commandSender, resultTime, Phrase.LOOKUP_CONTAINER, selector, resultUser, target, resultAmount, x, y, z, worldId, rbFormat, true, tag.contains("+"));
             }
             results.close();
@@ -147,18 +142,13 @@ public class ChestTransactionLookup {
                 if (count > limit) {
                     result.add(new JsonBuilder(Color.WHITE + "-----"));
                     result.add(new JsonBuilder(Util.getPageNavigationJson(command, page, totalPages)));
-                    //result.add(Color.WHITE + "-----");
-                    //result.add(Util.getPageNavigation(command, page, totalPages));
                 }
             }
             else {
                 if (rowMax > count && count > 0) {
                     result.add(new JsonBuilder(Color.DARK_AQUA + "CoreProtect " + Color.WHITE + "- " + Phrase.build(Phrase.NO_RESULTS_PAGE, Selector.SECOND)));
-                    //result.add(Color.DARK_AQUA + "CoreProtect " + Color.WHITE + "- " + Phrase.build(Phrase.NO_RESULTS_PAGE, Selector.SECOND));
-                }
-                else {
+                } else {
                     result.add(new JsonBuilder(Color.DARK_AQUA + "CoreProtect " + Color.WHITE + "- " + Phrase.build(Phrase.NO_DATA_LOCATION, Selector.SECOND)));
-                    //result.add(Color.DARK_AQUA + "CoreProtect " + Color.WHITE + "- " + Phrase.build(Phrase.NO_DATA_LOCATION, Selector.SECOND));
                 }
             }
 
