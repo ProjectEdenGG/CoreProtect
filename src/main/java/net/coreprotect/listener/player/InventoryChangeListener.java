@@ -203,7 +203,7 @@ public final class InventoryChangeListener extends Queue implements Listener {
         return false;
     }
 
-    private static void onInventoryInteractAsync(Player player, Inventory inventory, boolean enderChest) {
+    static void onInventoryInteractAsync(Player player, Inventory inventory, boolean enderChest) {
         if (inventory == null) {
             return;
         }
@@ -317,7 +317,12 @@ public final class InventoryChangeListener extends Queue implements Listener {
             return;
         }
 
-        Location location = event.getSource().getLocation();
+        Inventory sourceInventory = event.getSource();
+        if (sourceInventory == null) {
+            return;
+        }
+
+        Location location = sourceInventory.getLocation();
         if (location == null) {
             return;
         }
@@ -327,7 +332,7 @@ public final class InventoryChangeListener extends Queue implements Listener {
             return;
         }
 
-        InventoryHolder sourceHolder = PaperAdapter.ADAPTER.getHolder(event.getSource(), false);
+        InventoryHolder sourceHolder = PaperAdapter.ADAPTER.getHolder(sourceInventory, false);
         if (sourceHolder == null) {
             return;
         }
