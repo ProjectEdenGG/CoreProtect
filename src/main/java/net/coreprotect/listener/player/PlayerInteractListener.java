@@ -686,10 +686,10 @@ public final class PlayerInteractListener extends Queue implements Listener {
                                 ItemStack mainHand = player.getInventory().getItemInMainHand();
                                 ItemStack offHand = player.getInventory().getItemInOffHand();
 
-                                if (event.getHand().equals(EquipmentSlot.HAND) && mainHand != null && Tag.ITEMS_MUSIC_DISCS.isTagged(mainHand.getType())) {
+                                if (event.getHand().equals(EquipmentSlot.HAND) && mainHand != null && Tag.ITEMS_CREEPER_DROP_MUSIC_DISCS.isTagged(mainHand.getType())) {
                                     handItem = mainHand;
                                 }
-                                else if (event.getHand().equals(EquipmentSlot.OFF_HAND) && offHand != null && Tag.ITEMS_MUSIC_DISCS.isTagged(offHand.getType())) {
+                                else if (event.getHand().equals(EquipmentSlot.OFF_HAND) && offHand != null && Tag.ITEMS_CREEPER_DROP_MUSIC_DISCS.isTagged(offHand.getType())) {
                                     handItem = offHand;
                                 }
                                 else {

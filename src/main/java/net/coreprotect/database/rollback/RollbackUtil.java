@@ -93,7 +93,7 @@ public class RollbackUtil extends Lookup {
             else if (type != null && type.equals(Material.JUKEBOX)) {
                 Jukebox jukebox = (Jukebox) container;
                 if (jukebox != null) {
-                    if (action == 1 && Tag.ITEMS_MUSIC_DISCS.isTagged(itemstack.getType())) {
+                    if (action == 1 && Tag.ITEMS_CREEPER_DROP_MUSIC_DISCS.isTagged(itemstack.getType())) {
                         itemstack.setAmount(1);
                     }
                     else {

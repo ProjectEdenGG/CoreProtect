@@ -1046,17 +1046,17 @@ public class Util extends Queue {
                 return Material.ARMOR_STAND;
             case ITEM_FRAME:
                 return Material.ITEM_FRAME;
-            case ENDER_CRYSTAL:
+            case END_CRYSTAL:
                 return Material.END_CRYSTAL;
             case ENDER_PEARL:
                 return Material.ENDER_PEARL;
-            case SPLASH_POTION:
+            case POTION:
                 return Material.SPLASH_POTION;
-            case THROWN_EXP_BOTTLE:
+            case EXPERIENCE_BOTTLE:
                 return Material.EXPERIENCE_BOTTLE;
             case TRIDENT:
                 return Material.TRIDENT;
-            case FIREWORK:
+            case FIREWORK_ROCKET:
                 return Material.FIREWORK_ROCKET;
             case EGG:
                 return Material.EGG;
