@@ -7,7 +7,6 @@ import java.util.Map;
 import org.bukkit.FireworkEffect;
 import org.bukkit.FireworkEffect.Builder;
 import org.bukkit.Material;
-import org.bukkit.Tag;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.block.Jukebox;
@@ -93,7 +92,7 @@ public class RollbackUtil extends Lookup {
             else if (type != null && type.equals(Material.JUKEBOX)) {
                 Jukebox jukebox = (Jukebox) container;
                 if (jukebox != null) {
-                    if (action == 1 && Tag.ITEMS_CREEPER_DROP_MUSIC_DISCS.isTagged(itemstack.getType())) {
+                    if (action == 1 && itemstack.getType().name().startsWith("MUSIC_DISC")) {
                         itemstack.setAmount(1);
                     }
                     else {
@@ -347,10 +346,17 @@ public class RollbackUtil extends Lookup {
                     List<Object> modifiers = (List<Object>) mapData.get("modifiers");
 
                     for (Object item : modifiers) {
-                        Map<Attribute, Map<String, Object>> modifiersMap = (Map<Attribute, Map<String, Object>>) item;
-                        for (Map.Entry<Attribute, Map<String, Object>> entry : modifiersMap.entrySet()) {
+                        Map<Object, Map<String, Object>> modifiersMap = (Map<Object, Map<String, Object>>) item;
+                        for (Map.Entry<Object, Map<String, Object>> entry : modifiersMap.entrySet()) {
                             try {
-                                Attribute attribute = entry.getKey();
+                                Attribute attribute = null;
+                                if (entry.getKey() instanceof Attribute) {
+                                    attribute = (Attribute) entry.getKey();
+                                }
+                                else {
+                                    attribute = (Attribute) BukkitAdapter.ADAPTER.getRegistryValue((String) entry.getKey(), Attribute.class);
+                                }
+
                                 AttributeModifier modifier = AttributeModifier.deserialize(entry.getValue());
                                 itemMeta.addAttributeModifier(attribute, modifier);
                             }

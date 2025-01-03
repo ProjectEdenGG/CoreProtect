@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import org.bukkit.Bukkit;
 import net.coreprotect.event.CoreProtectPreLogBlockEvent;
 import net.coreprotect.event.CoreProtectPreLogBlockEvent.BlockAction;
 import org.bukkit.Location;
@@ -57,7 +58,7 @@ public class BlockBreakLogger {
             }
 
             CoreProtectPreLogEvent event = new CoreProtectPreLogEvent(user);
-            if (Config.getGlobal().API_ENABLED) {
+            if (Config.getGlobal().API_ENABLED && !Bukkit.isPrimaryThread()) {
                 CoreProtect.getInstance().getServer().getPluginManager().callEvent(event);
             }
 

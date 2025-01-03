@@ -6,6 +6,7 @@ import java.util.Locale;
 
 import net.coreprotect.event.CoreProtectPreLogBlockEvent;
 import net.coreprotect.event.CoreProtectPreLogBlockEvent.BlockAction;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.BlockState;
 
@@ -86,7 +87,7 @@ public class BlockPlaceLogger {
             }
 
             CoreProtectPreLogEvent event = new CoreProtectPreLogEvent(user);
-            if (Config.getGlobal().API_ENABLED) {
+            if (Config.getGlobal().API_ENABLED && !Bukkit.isPrimaryThread()) {
                 CoreProtect.getInstance().getServer().getPluginManager().callEvent(event);
             }
 
